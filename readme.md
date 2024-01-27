@@ -1,4 +1,4 @@
-### Pbar
+## Pbar
 
 Add a (very) simple progress bar or spinner to golang CLI. Does not support multilines.
 
@@ -6,9 +6,9 @@ Add a (very) simple progress bar or spinner to golang CLI. Does not support mult
 go get github.com/ermineaweb/pbar
 ```
 
-### Quick start
+## Quick start
 
-#### Progress Bar
+### Progress Bar
 
 ```golang
 // progress bar with total tasks known
@@ -20,7 +20,23 @@ for _, task := range tasks {
 }
 ```
 
-#### Spinner
+#### Custom configuration
+
+```golang
+pbar := pbar.NewPbar(
+    pbar.ConfigPbar{
+        TotalTasks:           uint16(tasks),
+        CharDone:             '-',
+        CharTodo:             '-',
+        ColorPercentWorking:  pbar.RED_BRIGHT,
+        ColorPercentFinished: pbar.GREEN,
+        ColorCharDone:        pbar.RED_BRIGHT,
+        ColorCharTodo:        pbar.BLACK_BRIGHT,
+    },
+)
+```
+
+### Spinner
 
 ```golang
 // spinner with total tasks unknown
@@ -33,24 +49,17 @@ sp.Start()
 sp.Stop()
 ```
 
-### Custom configurations
+#### Custom configuration
 
 ```golang
-pb := pbar.NewPbar(
-    pbar.ConfigPbar{
-        TotalTasks: uint16(tasks),
-        CharDone:   '#',
-        CharTodo:   '-',
-    },
-)
-```
-
-```golang
-sp := pbar.NewSpinner(
+spinner := pbar.NewSpinner(
     pbar.ConfigSpinner{
-        Spinner:      pbar.SPINNER_ARROW,
-        StartMessage: "Let's work!",
-        StopMessage:  "Job's done!",
+        Spinner:          pbar.SPINNER_ARROW,
+        StartMessage:     "Let's work!",
+        StopMessage:      "Job's done!",
+        ColorSpinner:     pbar.RED_BRIGHT,
+        ColorTimer:       pbar.BLUE_BRIGHT,
+        AnimationDelayMs: 130,
     },
 )
 ```

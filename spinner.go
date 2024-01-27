@@ -13,27 +13,36 @@ var (
 )
 
 type ConfigSpinner struct {
-	Spinner      SpinnerType
-	StartMessage string
-	StopMessage  string
+	Spinner          SpinnerType
+	StartMessage     string
+	StopMessage      string
+	ColorSpinner     color
+	ColorTimer       color
+	AnimationDelayMs uint16
 }
 
 type spinner struct {
-	spType    SpinnerType
-	startMsg  string
-	stopMsg   string
-	startedAt time.Time
-	stopCh    chan bool
-	doneCh    chan bool
+	spType      SpinnerType
+	startMsg    string
+	stopMsg     string
+	colorSp     color
+	colorTimer  color
+	animDelayMs uint16
+	startedAt   time.Time
+	stopCh      chan bool
+	doneCh      chan bool
 }
 
 func NewSpinner(cfg ConfigSpinner) *spinner {
 	sp := &spinner{
-		spType:   SPINNER_POINTS,
-		startMsg: "Work in progress since:",
-		stopMsg:  "Work finished in",
-		stopCh:   make(chan bool, 1),
-		doneCh:   make(chan bool, 1),
+		spType:      SPINNER_POINTS,
+		startMsg:    "Work in progress since:",
+		stopMsg:     "Work finished in",
+		colorSp:     BLUE_BRIGHT,
+		colorTimer:  BLUE_BRIGHT,
+		animDelayMs: 100,
+		stopCh:      make(chan bool, 1),
+		doneCh:      make(chan bool, 1),
 	}
 
 	sp.customSpinnerConfig(cfg)
@@ -50,6 +59,15 @@ func (sp *spinner) customSpinnerConfig(cfg ConfigSpinner) {
 	if cfg.StopMessage != "" {
 		sp.stopMsg = cfg.StopMessage
 	}
+	if cfg.ColorSpinner != "" {
+		sp.colorSp = cfg.ColorSpinner
+	}
+	if cfg.ColorTimer != "" {
+		sp.colorTimer = cfg.ColorTimer
+	}
+	if cfg.AnimationDelayMs != 0 {
+		sp.animDelayMs = cfg.AnimationDelayMs
+	}
 }
 
 func (sp *spinner) Start() {
@@ -57,16 +75,16 @@ func (sp *spinner) Start() {
 
 	go func() {
 		for i := 0; i < len(sp.spType); i++ {
-			fmt.Printf("\r%v", DELETE_LINE)
+			fmt.Printf("\r%v", delete_line)
 
 			select {
 			case <-sp.stopCh:
-				fmt.Printf("    %s %s%s%s\n", sp.stopMsg, YELLOW_BOLD, time.Since(sp.startedAt).Truncate(time.Millisecond), RESET_COLOR)
+				fmt.Printf("    %s %s%s%s\n", sp.stopMsg, sp.colorTimer, time.Since(sp.startedAt).Truncate(time.Millisecond), default_color)
 				sp.doneCh <- true
 				return
 			default:
-				fmt.Printf("  %s%v%s %s %s%s%s", YELLOW_BOLD, sp.spType[i], RESET_COLOR, sp.startMsg, YELLOW_BOLD, time.Since(sp.startedAt).Truncate(time.Second), RESET_COLOR)
-				time.Sleep(100 * time.Millisecond)
+				fmt.Printf("  %s%v%s %s %s%s%s", sp.colorSp, sp.spType[i], default_color, sp.startMsg, sp.colorTimer, time.Since(sp.startedAt).Truncate(time.Second), default_color)
+				time.Sleep(time.Duration(sp.animDelayMs) * time.Millisecond)
 				if i+1 == len(sp.spType) {
 					i = -1
 				}

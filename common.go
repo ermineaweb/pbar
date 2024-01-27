@@ -1,21 +1,29 @@
 package pbar
 
-const (
-	DELETE_LINE = "\033[K"
+type color string
 
-	// terminal colors
-	GREEN_BG            = "\x1B[0;;102m"
-	RED                 = "\x1B[0;91m"
-	YELLOW              = "\x1B[0;93m"
-	RED_BRIGHT_BOLD     = "\x1B[1;91m"
-	GREEN_BRIGHT_BOLD   = "\x1B[1;92m"
-	YELLOW_BRIGHT_BOLD  = "\x1B[1;93m"
-	BLUE_BRIGHT_BOLD    = "\x1B[1;94m"
-	MAGENTA_BRIGHT_BOLD = "\x1B[1;35m"
-	CYAN_BRIGHT_BOLD    = "\x1B[1;36m"
-	WHITE_BRIGHT_BOLD   = "\x1B[1;37m"
-	RED_BOLD            = "\x1B[1;31m"
-	GREEN_BOLD          = "\x1B[1;32m"
-	YELLOW_BOLD         = "\x1B[1;33m"
-	RESET_COLOR         = "\x1B[1;0m"
+const (
+	delete_line = "\033[K"
+
+	// public bright colors for custom configuration
+	BLACK_BRIGHT   color = "\x1B[1;90m"
+	RED_BRIGHT     color = "\x1B[1;91m"
+	GREEN_BRIGHT   color = "\x1B[1;92m"
+	YELLOW_BRIGHT  color = "\x1B[1;93m"
+	BLUE_BRIGHT    color = "\x1B[1;94m"
+	MAGENTA_BRIGHT color = "\x1B[1;95m"
+	CYAN_BRIGHT    color = "\x1B[1;96m"
+	WHITE_BRIGHT   color = "\x1B[1;97m"
+
+	// public basics colors for custom configuration
+	BLACK   color = "\x1B[1;30m"
+	RED     color = "\x1B[1;31m"
+	GREEN   color = "\x1B[1;32m"
+	YELLOW  color = "\x1B[1;33m"
+	BLUE    color = "\x1B[1;34m"
+	MAGENTA color = "\x1B[1;35m"
+	CYAN    color = "\x1B[1;36m"
+	WHITE   color = "\x1B[1;37m"
+
+	default_color color = "\x1B[1;0m"
 )

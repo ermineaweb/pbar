@@ -11,7 +11,7 @@ import (
 func main() {
 	var wg sync.WaitGroup
 
-	use := "progress"
+	use := "spinner"
 	tasks := 25
 
 	switch use {
@@ -19,9 +19,12 @@ func main() {
 	case "spinner":
 		spinner := pbar.NewSpinner(
 			pbar.ConfigSpinner{
-				Spinner:      pbar.SPINNER_ARROW,
-				StartMessage: "Let's work!",
-				StopMessage:  "Job's done!",
+				Spinner:          pbar.SPINNER_ARROW,
+				StartMessage:     "Let's work!",
+				StopMessage:      "Job's done!",
+				ColorSpinner:     pbar.RED_BRIGHT,
+				ColorTimer:       pbar.BLUE_BRIGHT,
+				AnimationDelayMs: 130,
 			},
 		)
 
@@ -39,9 +42,13 @@ func main() {
 	case "progress":
 		pbar := pbar.NewPbar(
 			pbar.ConfigPbar{
-				TotalTasks: uint16(tasks),
-				CharDone:   '#',
-				CharTodo:   '-',
+				TotalTasks:           uint16(tasks),
+				CharDone:             '-',
+				CharTodo:             '-',
+				ColorPercentWorking:  pbar.RED_BRIGHT,
+				ColorPercentFinished: pbar.GREEN,
+				ColorCharDone:        pbar.RED_BRIGHT,
+				ColorCharTodo:        pbar.BLACK_BRIGHT,
 			},
 		)
 
