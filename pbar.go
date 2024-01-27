@@ -105,10 +105,7 @@ func (pb *pbar) Add(increment int) {
 	}
 
 	percent := int(float64(pb.actual) / float64(pb.total) * 100.0)
-	pb.render(percent)
-}
 
-func (pb *pbar) render(percent int) {
 	fmt.Printf("\r%v", delete_line)
 
 	var pbar string
