@@ -11,13 +11,19 @@ import (
 	"unsafe"
 )
 
-type Pbar struct {
-	total     int
-	actual    int
-	width     int
-	startedAt time.Time
+type ConfigPbar struct {
+	TotalTasks uint16
+	CharDone   rune
+	CharTodo   rune
+}
+
+type pbar struct {
+	total     uint16
+	actual    uint16
+	width     uint16
 	charDone  rune
 	charTodo  rune
+	startedAt time.Time
 	signalCh  chan os.Signal
 	lock      sync.Mutex
 }
@@ -29,22 +35,36 @@ type windowSize struct {
 	Ypixel uint16
 }
 
-func NewPbar(total int) *Pbar {
-	pb := &Pbar{
-		total:    total,
+func NewPbar(cfg ConfigPbar) *pbar {
+	pb := &pbar{
+		total:    1,
 		charDone: '#',
 		charTodo: '-',
 		signalCh: make(chan os.Signal, 1),
 		lock:     sync.Mutex{},
 	}
 
+	pb.customPbarConfig(cfg)
 	pb.handleResize()
 	pb.updateSize()
 	pb.Add(0)
+
 	return pb
 }
 
-func (pb *Pbar) Add(increment int) {
+func (pb *pbar) customPbarConfig(cfg ConfigPbar) {
+	if cfg.TotalTasks > 0 {
+		pb.total = cfg.TotalTasks
+	}
+	if cfg.CharDone != 0 {
+		pb.charDone = cfg.CharDone
+	}
+	if cfg.CharTodo != 0 {
+		pb.charTodo = cfg.CharTodo
+	}
+}
+
+func (pb *pbar) Add(increment int) {
 	if pb.width == 0 {
 		return
 	}
@@ -56,29 +76,32 @@ func (pb *Pbar) Add(increment int) {
 		pb.startedAt = time.Now()
 	}
 
-	pb.actual += increment
-	percent := int(float64(pb.actual) / float64(pb.total) * 100.0)
+	if pb.actual += uint16(increment); pb.actual > pb.total {
+		return
+	}
 
-	fmt.Printf("\r%v", DELETE_LINE)
+	percent := int(float64(pb.actual) / float64(pb.total) * 100.0)
 
 	var pbar string
 
 	if pb.width > 28 {
-		widthTotal := pb.width - 28
+		widthTotal := int(pb.width - 28)
 		widthDone := int(float64(widthTotal) * float64(pb.actual) / float64(pb.total))
 		done := strings.Repeat(string(pb.charDone), widthDone)
 		todo := strings.Repeat(string(pb.charTodo), widthTotal-widthDone)
 		pbar = fmt.Sprintf(" [%s%s]", done, todo)
 	}
 
+	fmt.Printf("\r%v", DELETE_LINE)
+
 	if pb.actual >= pb.total {
-		fmt.Printf("[%s%3d%%%s] [%4d/%4d] [%4s]%s", GREEN_BOLD, percent, RESET_COLOR, pb.actual, pb.total, time.Since(pb.startedAt).Truncate(time.Second), pbar)
+		fmt.Printf("[%s%3d%%%s] [%4d/%4d] [%4s]%s\n", GREEN_BOLD, percent, RESET_COLOR, pb.actual, pb.total, time.Since(pb.startedAt).Truncate(time.Second), pbar)
 	} else {
 		fmt.Printf("[%s%3d%%%s] [%4d/%4d] [%4s]%s", YELLOW_BOLD, percent, RESET_COLOR, pb.actual, pb.total, time.Since(pb.startedAt).Truncate(time.Second), pbar)
 	}
 }
 
-func (pb *Pbar) updateSize() {
+func (pb *pbar) updateSize() {
 	winSize := &windowSize{}
 
 	if _, _, err := syscall.Syscall(
@@ -93,10 +116,10 @@ func (pb *Pbar) updateSize() {
 		}
 	}
 
-	pb.width = int(winSize.Col)
+	pb.width = winSize.Col
 }
 
-func (pb *Pbar) handleResize() {
+func (pb *pbar) handleResize() {
 	signal.Notify(pb.signalCh, syscall.SIGWINCH, syscall.SIGTERM, syscall.SIGINT)
 
 	go func() {

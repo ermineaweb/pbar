@@ -17,9 +17,17 @@ func main() {
 	switch use {
 
 	case "spinner":
-		spinner := pbar.NewSpinner(pbar.SPINNER_POINTS)
+		spinner := pbar.NewSpinner(
+			pbar.ConfigSpinner{
+				Spinner:      pbar.SPINNER_ARROW,
+				StartMessage: "Let's work!",
+				StopMessage:  "Job's done!",
+			},
+		)
+
 		spinner.Start()
 		defer spinner.Stop()
+
 		for i := 1; i <= tasks; i++ {
 			wg.Add(1)
 			go func(i int) {
@@ -29,7 +37,14 @@ func main() {
 		}
 
 	case "progress":
-		pbar := pbar.NewPbar(tasks)
+		pbar := pbar.NewPbar(
+			pbar.ConfigPbar{
+				TotalTasks: uint16(tasks),
+				CharDone:   '#',
+				CharTodo:   '-',
+			},
+		)
+
 		for i := 1; i <= tasks; i++ {
 			wg.Add(1)
 			go func(i int) {
