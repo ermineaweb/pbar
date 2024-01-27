@@ -32,7 +32,6 @@ type windowSize struct {
 func NewPbar(total int) *Pbar {
 	pb := &Pbar{
 		total:    total,
-		width:    50,
 		charDone: '#',
 		charTodo: '-',
 		signalCh: make(chan os.Signal, 1),
