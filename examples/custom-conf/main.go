@@ -16,12 +16,12 @@ func main() {
 	case "spinner":
 		spinner := pbar.NewCustomSpinner(
 			pbar.ConfigSpinner{
-				Spinner:          pbar.SPINNER_ARROW,
+				Spinner:          pbar.SPINNER_BIG_PENDULUM,
 				StartMessage:     "Let's work!",
 				StopMessage:      "Job's done!",
 				ColorSpinner:     pbar.RED_BRIGHT,
 				ColorTimer:       pbar.BLUE_BRIGHT,
-				AnimationDelayMs: 130,
+				AnimationDelayMs: 140,
 			},
 		)
 
@@ -36,6 +36,7 @@ func main() {
 		pbar := pbar.NewCustomPbar(
 			pbar.ConfigPbar{
 				TotalTasks:           uint64(tasks),
+				Infos:                true,
 				CharDone:             'o',
 				CharTodo:             '-',
 				ColorPercentWorking:  pbar.RED_BRIGHT,

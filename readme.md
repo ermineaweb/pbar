@@ -30,6 +30,7 @@ for _, task := range tasks {
 pbar := pbar.NewCustomPbar(
     pbar.ConfigPbar{
         TotalTasks:           uint64(tasks),
+        Infos:                true,
         CharDone:             'o',
         CharTodo:             '-',
         ColorPercentWorking:  pbar.RED_BRIGHT,

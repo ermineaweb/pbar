@@ -8,8 +8,16 @@ import (
 type SpinnerType []string
 
 var (
-	SPINNER_ARROW  = SpinnerType{"←", "↖", "↑", "↗", "→", "↘", "↓", "↙"}
-	SPINNER_POINTS = SpinnerType{"⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷"}
+	SPINNER_ARROW        = SpinnerType{"←", "↖", "↑", "↗", "→", "↘", "↓", "↙"}
+	SPINNER_POINTS       = SpinnerType{"⣾", "⣽", "⣻", "⢿", "⡿", "⣟", "⣯", "⣷"}
+	SPINNER_SIMPLEBAR    = SpinnerType{"|", "/", "-", "\\"}
+	SPINNER_HISTOGRAM    = SpinnerType{"▁", "▂", "▃", "▄", "▅", "▆", "▇", "█", "▇", "▆", "▅", "▄", "▃"}
+	SPINNER_PING         = SpinnerType{"▖", "▘", "▝", "▗"}
+	SPINNER_MOON         = SpinnerType{"◐", "◓", "◑", "◒"}
+	SPINNER_PENDULUM     = SpinnerType{"■ ■■ ", " ■■■ ", " ■■ ■", " ■■■ "}
+	SPINNER_BIG_PENDULUM = SpinnerType{"■  ■■■■  ", " ■ ■■■■  ", "  ■■■■■  ", "  ■■■■ ■ ", "  ■■■■  ■", "  ■■■■ ■ ", "  ■■■■■  ", " ■ ■■■■  "}
+	SPINNER_SQUARE       = SpinnerType{"■   ", "■■  ", "■■■ ", "■■■■", "■■■ ", "■■  "}
+	SPINNER_SNAKE        = SpinnerType{"■   ", "■■  ", "■■■ ", "■■■■", " ■■■", "  ■■", "   ■"}
 )
 
 type ConfigSpinner struct {
@@ -39,12 +47,12 @@ func NewDefaultSpinner() *spinner {
 
 func NewCustomSpinner(cfg ConfigSpinner) *spinner {
 	sp := &spinner{
-		spType:      SPINNER_POINTS,
+		spType:      SPINNER_PENDULUM,
 		startMsg:    "Work in progress since:",
 		stopMsg:     "Work finished in",
 		colorSp:     BLUE_BRIGHT,
 		colorTimer:  BLUE_BRIGHT,
-		animDelayMs: 100,
+		animDelayMs: 120,
 		stopCh:      make(chan bool, 1),
 		doneCh:      make(chan bool, 1),
 	}

@@ -15,6 +15,7 @@ type ConfigPbar struct {
 	TotalTasks           uint64
 	CharDone             rune
 	CharTodo             rune
+	Infos                bool
 	ColorPercentWorking  color
 	ColorPercentFinished color
 	ColorCharDone        color
@@ -25,6 +26,7 @@ type pbar struct {
 	total       uint64
 	actual      uint64
 	width       uint16
+	infos       bool
 	charDone    rune
 	charTodo    rune
 	colorPct    color
@@ -72,6 +74,9 @@ func (pb *pbar) customPbarConfig(cfg ConfigPbar) {
 	if cfg.TotalTasks > 0 {
 		pb.total = cfg.TotalTasks
 	}
+	if cfg.Infos == true {
+		pb.infos = cfg.Infos
+	}
 	if cfg.CharDone != 0 {
 		pb.charDone = cfg.CharDone
 	}
@@ -93,7 +98,7 @@ func (pb *pbar) customPbarConfig(cfg ConfigPbar) {
 }
 
 func (pb *pbar) Add(increment int) {
-	if pb.width == 0 {
+	if pb.width <= 3 {
 		return
 	}
 
@@ -109,23 +114,44 @@ func (pb *pbar) Add(increment int) {
 	}
 
 	percent := int(float64(pb.actual) / float64(pb.total) * 100.0)
+	elapsedTime := time.Since(pb.startedAt).Truncate(time.Second)
 
 	fmt.Printf("\r%v", delete_line)
 
-	var pbar string
+	var percentStr string
 	if pb.actual >= pb.total {
-		pbar = fmt.Sprintf("[%s%3d%%%s] [%4d/%-4d] [%4s]", pb.colorPctEnd, percent, default_color, pb.actual, pb.total, time.Since(pb.startedAt).Truncate(time.Second))
+		percentStr = fmt.Sprintf("%s%4d%%%s", pb.colorPctEnd, percent, default_color)
 	} else {
-		pbar = fmt.Sprintf("[%s%3d%%%s] [%4d/%-4d] [%4s]", pb.colorPct, percent, default_color, pb.actual, pb.total, time.Since(pb.startedAt).Truncate(time.Second))
+		percentStr = fmt.Sprintf("%s%4d%%%s", pb.colorPct, percent, default_color)
 	}
 
-	widthTotal := int(pb.width) - len(pbar) + 10
-	widthDone := int(float64(widthTotal) * float64(pb.actual) / float64(pb.total))
-	done := strings.Repeat(string(pb.charDone), widthDone)
-	todo := strings.Repeat(string(pb.charTodo), widthTotal-widthDone)
+	var infos string
+	if pb.infos == true {
+		var speed int
+		if elapsedTime > 0 {
+			speed = int(float64(pb.actual) / (float64((elapsedTime).Seconds())))
+		}
+		var taskStr = fmt.Sprintf("%8d/%d ", pb.actual, pb.total)
+		var elapsedTimeStr = fmt.Sprintf("%8s ", elapsedTime)
+		var speedStr = fmt.Sprintf("%8d/s ", speed)
+		infos = fmt.Sprintf("%s|%s|%s", taskStr, elapsedTimeStr, speedStr)
+	}
 
-	if pb.width > 30 {
-		pbar = fmt.Sprintf("%s [%s%s%s%s%s%s]", pbar, pb.colorDone, done, default_color, pb.colorTodo, todo, default_color)
+	var pbar string
+	switch {
+	case pb.width > 48:
+		widthTotal := int(pb.width) - len(percentStr) - len(infos) + 10
+		widthDone := int(float64(widthTotal) * float64(pb.actual) / float64(pb.total))
+		done := strings.Repeat(string(pb.charDone), widthDone)
+		todo := strings.Repeat(string(pb.charTodo), widthTotal-widthDone)
+		pbar = fmt.Sprintf("%s%s%s%s%s%s", pb.colorDone, done, default_color, pb.colorTodo, todo, default_color)
+		pbar = fmt.Sprintf("%s [%s]%s", percentStr, pbar, infos)
+
+	case pb.width > 42:
+		pbar = fmt.Sprintf("%s |%s", percentStr, infos)
+
+	default:
+		pbar = percentStr
 	}
 
 	fmt.Print(pbar)
