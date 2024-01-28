@@ -1,6 +1,8 @@
 ## Pbar
 
-Add a (very) simple progress bar or spinner to golang CLI. Does not support multilines.
+Add a simple progress bar or spinner to golang CLI.  
+Light with no external dependencies.  
+Does not support multilines.
 
 ```bash
 go get github.com/ermineaweb/pbar
@@ -10,9 +12,11 @@ go get github.com/ermineaweb/pbar
 
 ### Progress Bar
 
+![pbar](img/pbar.png)
+
 ```golang
 // progress bar with total tasks known
-pb := pbar.NewPbar(pbar.ConfigPbar{TotalTasks: uint16(len(tasks))})
+pb := pbar.NewDefaultPbar(len(tasks))
 
 for _, task := range tasks {
     longWork(task)
@@ -23,10 +27,10 @@ for _, task := range tasks {
 #### Custom configuration
 
 ```golang
-pbar := pbar.NewPbar(
+pbar := pbar.NewCustomPbar(
     pbar.ConfigPbar{
-        TotalTasks:           uint16(tasks),
-        CharDone:             '-',
+        TotalTasks:           uint64(tasks),
+        CharDone:             'o',
         CharTodo:             '-',
         ColorPercentWorking:  pbar.RED_BRIGHT,
         ColorPercentFinished: pbar.GREEN,
@@ -38,9 +42,11 @@ pbar := pbar.NewPbar(
 
 ### Spinner
 
+![spinner](img/spinner.png)
+
 ```golang
 // spinner with total tasks unknown
-sp := pbar.NewSpinner(pbar.ConfigSpinner{})
+sp := pbar.NewDefaultSpinner(pbar.ConfigSpinner{})
 
 sp.Start()
 
@@ -52,7 +58,7 @@ sp.Stop()
 #### Custom configuration
 
 ```golang
-spinner := pbar.NewSpinner(
+spinner := pbar.NewCustomSpinner(
     pbar.ConfigSpinner{
         Spinner:          pbar.SPINNER_ARROW,
         StartMessage:     "Let's work!",

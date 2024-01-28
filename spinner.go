@@ -33,7 +33,11 @@ type spinner struct {
 	doneCh      chan bool
 }
 
-func NewSpinner(cfg ConfigSpinner) *spinner {
+func NewDefaultSpinner() *spinner {
+	return NewCustomSpinner(ConfigSpinner{})
+}
+
+func NewCustomSpinner(cfg ConfigSpinner) *spinner {
 	sp := &spinner{
 		spType:      SPINNER_POINTS,
 		startMsg:    "Work in progress since:",
@@ -71,9 +75,9 @@ func (sp *spinner) customSpinnerConfig(cfg ConfigSpinner) {
 }
 
 func (sp *spinner) Start() {
-	sp.startedAt = time.Now()
-
 	go func() {
+		sp.startedAt = time.Now()
+
 		for i := 0; i < len(sp.spType); i++ {
 			fmt.Printf("\r%v", delete_line)
 

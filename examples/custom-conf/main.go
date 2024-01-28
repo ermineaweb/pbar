@@ -2,22 +2,19 @@ package main
 
 import (
 	"math/rand"
-	"sync"
 	"time"
 
 	"github.com/ermineaweb/pbar"
 )
 
 func main() {
-	var wg sync.WaitGroup
-
 	use := "spinner"
-	tasks := 25
+	tasks := 150
 
 	switch use {
 
 	case "spinner":
-		spinner := pbar.NewSpinner(
+		spinner := pbar.NewCustomSpinner(
 			pbar.ConfigSpinner{
 				Spinner:          pbar.SPINNER_ARROW,
 				StartMessage:     "Let's work!",
@@ -32,18 +29,14 @@ func main() {
 		defer spinner.Stop()
 
 		for i := 1; i <= tasks; i++ {
-			wg.Add(1)
-			go func(i int) {
-				defer wg.Done()
-				work(i)
-			}(i)
+			work(i)
 		}
 
 	case "progress":
-		pbar := pbar.NewPbar(
+		pbar := pbar.NewCustomPbar(
 			pbar.ConfigPbar{
-				TotalTasks:           uint16(tasks),
-				CharDone:             '-',
+				TotalTasks:           uint64(tasks),
+				CharDone:             'o',
 				CharTodo:             '-',
 				ColorPercentWorking:  pbar.RED_BRIGHT,
 				ColorPercentFinished: pbar.GREEN,
@@ -53,19 +46,14 @@ func main() {
 		)
 
 		for i := 1; i <= tasks; i++ {
-			wg.Add(1)
-			go func(i int) {
-				defer wg.Done()
-				work(i)
-				pbar.Add(1)
-			}(i)
+			work(i)
+			pbar.Add(1)
+
 		}
 	}
-
-	wg.Wait()
 }
 
 func work(i int) {
-	rnd := rand.Intn(8000) + 1000
+	rnd := rand.Intn(100) + 20
 	time.Sleep(time.Duration(rnd) * time.Millisecond)
 }

@@ -12,7 +12,7 @@ import (
 )
 
 type ConfigPbar struct {
-	TotalTasks           uint16
+	TotalTasks           uint64
 	CharDone             rune
 	CharTodo             rune
 	ColorPercentWorking  color
@@ -22,8 +22,8 @@ type ConfigPbar struct {
 }
 
 type pbar struct {
-	total       uint16
-	actual      uint16
+	total       uint64
+	actual      uint64
 	width       uint16
 	charDone    rune
 	charTodo    rune
@@ -43,7 +43,11 @@ type windowSize struct {
 	Ypixel uint16
 }
 
-func NewPbar(cfg ConfigPbar) *pbar {
+func NewDefaultPbar(total int) *pbar {
+	return NewCustomPbar(ConfigPbar{TotalTasks: uint64(total)})
+}
+
+func NewCustomPbar(cfg ConfigPbar) *pbar {
 	pb := &pbar{
 		total:       1,
 		charDone:    '#',
@@ -100,7 +104,7 @@ func (pb *pbar) Add(increment int) {
 		pb.startedAt = time.Now()
 	}
 
-	if pb.actual += uint16(increment); pb.actual > pb.total {
+	if pb.actual += uint64(increment); pb.actual > pb.total {
 		return
 	}
 
